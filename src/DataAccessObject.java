@@ -29,6 +29,7 @@ public class DataAccessObject {
             preparedStatement.executeUpdate();
 
             System.out.println("\n== Задача успешно создано! ==");
+            Main.menu();
         } catch (SQLException error) {
             System.out.println("Ошибка при подключений к базе данных");
             error.printStackTrace();
@@ -45,6 +46,7 @@ public class DataAccessObject {
 
             Scanner scanner = new Scanner(System.in);
 
+            int num = 1;
             while (resultSet.next()) {
                 String title = resultSet.getString("title");
                 String description = resultSet.getString("description");
@@ -55,11 +57,11 @@ public class DataAccessObject {
                 if (status.equals(false)) {
                     progress = "[✅] Выполнено";
                 } else {
-                    progress = "[❌] Выполняется";
+                    progress = "[❌] Не выполнено";
                 }
 
                 System.out.println("\n========================================");
-                System.out.println("|              Задача                  |");
+                System.out.println("|            "+num+" Задача               |");
                 System.out.println("========================================");
                 System.out.println("| Название    : "+title+"               ");
                 System.out.println("| Описание    : "+description+"         ");
@@ -67,23 +69,54 @@ public class DataAccessObject {
                 System.out.println("| Статус      : "+progress+"            ");
                 System.out.println("========================================");
 
+                num++;
             }
 
-            while (true) {
-                System.out.print("\n0. Вернуться назад: ");
-                byte check = scanner.nextByte();
+            if (Main.isCalledFrom("deleteTask")) {
+                System.out.print("\nВведите название задачи которую нужно удалить: ");
+                String choose = scanner.nextLine();
 
-                switch (check) {
-                    case 0:
-                        Main.menu();
-                        break;
-                    default:
-                        System.out.println("⚠ Введите корректное значение ⚠");
-                        break;
-                }
+                deleteTask(choose);
+            } else {
+                continueSeeTask();
             }
+        } catch (SQLException error) {
+            error.printStackTrace();
+        }
+    }
 
+    private static void continueSeeTask() { // продложение выше стоящего метода
+        Scanner scanner = new Scanner(System.in);
 
+        while (true) {
+            System.out.print("\n0. Вернуться назад: ");
+            byte check = scanner.nextByte();
+
+            switch (check) {
+                case 0:
+                    Main.menu();
+                    break;
+                default:
+                    System.out.println("⚠ Введите корректное значение ⚠");
+                    break;
+            }
+        }
+
+    }
+
+    public static void deleteTask(String choose) {
+
+        String delete = "DELETE FROM tasks WHERE title = ?";
+
+        try (Connection connection = connect();
+             PreparedStatement preparedStatement = connection.prepareStatement(delete)) {
+
+            preparedStatement.setString(1, choose);
+
+            int rowAffected = preparedStatement.executeUpdate();
+            System.out.println("\nЗадача " + choose + " успешно удалено");
+
+            continueSeeTask();
         } catch (SQLException error) {
             error.printStackTrace();
         }

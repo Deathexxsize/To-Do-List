@@ -28,6 +28,15 @@ public class Main {
             case 2:
                 seeTask();
                 break;
+            case 3:
+                updateTask();
+                break;
+            case 4:
+                deleteTask();
+                break;
+            default:
+                System.out.println("⚠ Выберите корректный вариант");
+                break;
         }
     }
 
@@ -47,7 +56,24 @@ public class Main {
         DataAccessObject.addTask(task, description);
     }
 
-    public static void seeTask() {
+    public static void seeTask() { // Просмотр всех задач
         DataAccessObject.seeTask();
+    }
+
+    public static void updateTask() {
+        System.out.println("упс.. фичя еще пишется");
+    }
+
+    public static void deleteTask() {
+
+        Scanner scanner = new Scanner(System.in);
+
+        DataAccessObject.seeTask();
+    }
+
+    public static boolean isCalledFrom(String methodName) { // Проверяет от куда был вызван метод
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        String callerMethodName = stackTrace[3].getMethodName();
+        return callerMethodName.equals(methodName);
     }
 }
