@@ -1,13 +1,20 @@
+import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import java.sql.SQLOutput;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        menu();
+    }
 
-        System.out.println("==========================");
+    public static void menu() {
+
+        System.out.println("\n\n==========================");
         System.out.println("      To-Do List App      ");
+        System.out.println("       главное меню       ");
         System.out.println("==========================");
+
+        Scanner scanner = new Scanner(System.in);
 
         System.out.println("\n1. Добавить задачу\n2. Просмотреть все задачи\n3. Обновить задачу\n4. Удалить задачу");
 
@@ -18,11 +25,13 @@ public class Main {
             case 1:
                 addTask();
                 break;
+            case 2:
+                seeTask();
+                break;
         }
-
     }
 
-    public static void addTask () {
+    public static void addTask () { // Добавляет задачу
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("\n\n\n===========================");
@@ -36,5 +45,9 @@ public class Main {
         String description = scanner.nextLine();
 
         DataAccessObject.addTask(task, description);
+    }
+
+    public static void seeTask() {
+        DataAccessObject.seeTask();
     }
 }
