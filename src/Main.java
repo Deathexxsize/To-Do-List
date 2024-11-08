@@ -60,8 +60,13 @@ public class Main {
         DataAccessObject.seeTask();
     }
 
-    public static void updateTask() {
-        System.out.println("упс.. фичя еще пишется");
+    public static void updateTask() { // Метод для выбора задачи и передачи названия
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Введите название задачи для изменения: ");
+        String choose = scanner.nextLine();
+
+        DataAccessObject.updateTask(choose);
     }
 
     public static void deleteTask() {

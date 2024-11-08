@@ -52,12 +52,12 @@ public class DataAccessObject {
                 String description = resultSet.getString("description");
                 String status = resultSet.getString("status");
 
-                String progress;
+                String progress = "";
 
-                if (status.equals(false)) {
-                    progress = "[✅] Выполнено";
-                } else {
+                if (status.equals("false")) {
                     progress = "[❌] Не выполнено";
+                } else if (status.equals("true")){
+                    progress = "[✅] Выполнено";
                 }
 
                 System.out.println("\n========================================");
@@ -104,7 +104,70 @@ public class DataAccessObject {
 
     }
 
-    public static void deleteTask(String choose) {
+    public static void updateTask(String choose) { // Метод для обновления задачи
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("1. Изменить название \n2. Изменить описание \n3. Изменить статус");
+        System.out.print("\nВыбрать: ");
+        byte num = scanner.nextByte();
+        scanner.nextLine(); // Добавляем после nextByte, чтобы избежать пропуска
+
+        String update = "";
+        String newTask = "";
+        boolean status = false; // Для статуса
+
+        try (Connection connection = connect()) {
+
+            if (num == 1) {
+                update = "UPDATE tasks SET title = ? WHERE title = ?";
+                System.out.print("Введите новое название: ");
+                newTask = scanner.nextLine();
+
+            } else if (num == 2) {
+                update = "UPDATE tasks SET description = ? WHERE title = ?";
+                System.out.print("Введите новое описание: ");
+                newTask = scanner.nextLine();
+
+            } else if (num == 3) {
+                update = "UPDATE tasks SET status = ? WHERE title = ?";
+                System.out.print("Введите новый статус (Выполнено / Не выполнено): ");
+                String statusInput = scanner.nextLine();
+
+                if (statusInput.equalsIgnoreCase("Выполнено")) {
+                    status = true;
+                } else if (statusInput.equalsIgnoreCase("Не выполнено")) {
+                    status = false;
+                } else {
+                    System.out.println("Неверный ввод для статуса. Укажите 'Выполнено' или 'Не выполнено'.");
+                    return;
+                }
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(update)) {
+
+                if (num == 3) {
+                    preparedStatement.setBoolean(1, status);
+                } else {
+                    preparedStatement.setString(1, newTask);
+                }
+
+                preparedStatement.setString(2, choose);
+                int rowsAffected = preparedStatement.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    System.out.println("Задача успешно обновлена!");
+                } else {
+                    System.out.println("Задача не найдена.");
+                }
+
+            }
+
+        } catch (SQLException error) {
+            error.printStackTrace();
+        }
+    }
+
+    public static void deleteTask(String choose) { // Удаление задачи
 
         String delete = "DELETE FROM tasks WHERE title = ?";
 
@@ -114,7 +177,7 @@ public class DataAccessObject {
             preparedStatement.setString(1, choose);
 
             int rowAffected = preparedStatement.executeUpdate();
-            System.out.println("\nЗадача " + choose + " успешно удалено");
+            System.out.println("\nЗадача \"" + choose + "\" успешно удалено");
 
             continueSeeTask();
         } catch (SQLException error) {
